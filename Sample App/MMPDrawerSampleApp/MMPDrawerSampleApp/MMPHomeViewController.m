@@ -73,40 +73,48 @@ typedef enum
 - (void)moveLeft
 {
     UIView *childView = [self getRightView];
-    [self.view sendSubviewToBack:childView];
     
-    [UIView animateWithDuration:ANIMATE_DURATION
-                          delay:0
-                        options:UIViewAnimationOptionBeginFromCurrentState
-                     animations:^{
-                         _mainVC.view.frame = CGRectMake(-self.view.frame.size.width + SHOW_MAIN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
-                     }
-                     completion:^(BOOL finished){
-                         if (finished)
-                         {
-                             _rightButton.tag = 0;
+    if (childView)
+    {
+        [self.view sendSubviewToBack:childView];
+        
+        [UIView animateWithDuration:ANIMATE_DURATION
+                              delay:0
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+                             _mainVC.view.frame = CGRectMake(-self.view.frame.size.width + SHOW_MAIN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
                          }
-                     }];
+                         completion:^(BOOL finished){
+                             if (finished)
+                             {
+                                 _rightButton.tag = 0;
+                             }
+                         }];
+    }
 }
 
 // Moves the main view to right and Shows the left view controller
 -(void)moveRight
 {
     UIView *childView = [self getLeftView];
-    [self.view sendSubviewToBack:childView];
     
-    [UIView animateWithDuration:ANIMATE_DURATION
-                          delay:0
-                        options:UIViewAnimationOptionBeginFromCurrentState
-                     animations:^{
-                         _mainVC.view.frame = CGRectMake(self.view.frame.size.width - SHOW_MAIN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
-                     }
-                     completion:^(BOOL finished) {
-                         if (finished)
-                         {
-                             _leftButton.tag = 0;
+    if (childView)
+    {
+        [self.view sendSubviewToBack:childView];
+        
+        [UIView animateWithDuration:ANIMATE_DURATION
+                              delay:0
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+                             _mainVC.view.frame = CGRectMake(self.view.frame.size.width - SHOW_MAIN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
                          }
-                     }];
+                         completion:^(BOOL finished) {
+                             if (finished)
+                             {
+                                 _leftButton.tag = 0;
+                             }
+                         }];
+    }
 }
 
 // Resets the previous movements and shows the initial view controller
@@ -185,17 +193,24 @@ typedef enum
         }
         
     }
-    [self.view sendSubviewToBack:childView];
-    [[sender view] bringSubviewToFront:[(UIPanGestureRecognizer*)sender view]];
+    
+    if (childView)
+    {
+        [self.view sendSubviewToBack:childView];
+        [[sender view] bringSubviewToFront:[(UIPanGestureRecognizer*)sender view]];
+    }
 }
 
 // Handles the Gesture Movement Changed Event
 - (void)gestureMovementChangedOn:(id)sender withVelocity:(CGPoint)velocity andTranslatedPoint:(CGPoint)translatedPoint
 {
-    _canShowDrawer = abs([sender view].center.x - _mainVC.view.frame.size.width/2) > _mainVC.view.frame.size.width/2;
-    [sender view].center = CGPointMake([sender view].center.x + translatedPoint.x, [sender view].center.y);
-    [(UIPanGestureRecognizer*)sender setTranslation:CGPointMake(0,0) inView:self.view];
-    _previousVelocity = velocity;
+    if ((velocity.x > 0 && _leftVC) || (velocity.x < 0 && _rightVC))
+    {
+        _canShowDrawer = abs([sender view].center.x - _mainVC.view.frame.size.width/2) > _mainVC.view.frame.size.width/2;
+        [sender view].center = CGPointMake([sender view].center.x + translatedPoint.x, [sender view].center.y);
+        [(UIPanGestureRecognizer*)sender setTranslation:CGPointMake(0,0) inView:self.view];
+        _previousVelocity = velocity;
+    }
 }
 
 // Handles the Gesture Movement Ended Event
@@ -231,11 +246,11 @@ typedef enum
         [self addChildViewController:_leftVC];
         [_leftVC didMoveToParentViewController:self];
         _leftVC.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+        self.isLeftDrawerOpen = YES;
+        
+        // Adds shadow
+        [self showCenterViewWithShadow:YES withOffset:-2];
     }
-    self.isLeftDrawerOpen = YES;
-    
-    // Adds shadow
-    [self showCenterViewWithShadow:YES withOffset:-2];
     return self.leftVC.view;
 }
 
@@ -250,11 +265,11 @@ typedef enum
         [self addChildViewController:self.rightVC];
         [_rightVC didMoveToParentViewController:self];
         _rightVC.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+        self.isRightDrawerOpen = YES;
+        
+        // Adds Shadow
+        [self showCenterViewWithShadow:YES withOffset:2];
     }
-    self.isRightDrawerOpen = YES;
-    
-    // Adds Shadow
-    [self showCenterViewWithShadow:YES withOffset:2];
     return self.rightVC.view;
 }
 

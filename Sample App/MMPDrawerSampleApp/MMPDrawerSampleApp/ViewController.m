@@ -24,7 +24,7 @@
     center.delegate  = self;
     [self setMainVC:center];
     [self setRightVC:[[UIViewController alloc] initWithNibName:@"Right" bundle:nil]];
-    [self setLeftVC:[[UIViewController alloc] initWithNibName:@"Left" bundle:nil]];
+   // [self setLeftVC:[[UIViewController alloc] initWithNibName:@"Left" bundle:nil]];
     [self setupDrawers];
     
 }
