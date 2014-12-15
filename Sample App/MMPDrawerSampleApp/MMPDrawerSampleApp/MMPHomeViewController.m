@@ -204,7 +204,7 @@ typedef enum
 // Handles the Gesture Movement Changed Event
 - (void)gestureMovementChangedOn:(id)sender withVelocity:(CGPoint)velocity andTranslatedPoint:(CGPoint)translatedPoint
 {
-    if ((velocity.x > 0 && _leftVC) || (velocity.x < 0 && _rightVC))
+    if ((velocity.x > 0 && (_leftVC || _isRightDrawerOpen)) || (velocity.x < 0 && (_rightVC || _isLeftDrawerOpen)))
     {
         _canShowDrawer = abs([sender view].center.x - _mainVC.view.frame.size.width/2) > _mainVC.view.frame.size.width/2;
         [sender view].center = CGPointMake([sender view].center.x + translatedPoint.x, [sender view].center.y);
